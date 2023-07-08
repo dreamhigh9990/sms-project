@@ -676,7 +676,8 @@ class Controller extends BaseController
 		$invoices->save();
 		return redirect('/invoices');
 	}
-	public function updateRefill(Request $request) {
+	public function updateRefill(Request $request)
+	{
 		$customer = new  \App\Models\Customer();
 		$rate = $customer::where('id', $request->id)->value('balance') + $request->refillValue;
 		$customer::where('id', $request->id)->update([
@@ -684,18 +685,20 @@ class Controller extends BaseController
 		]);
 
 		return redirect('/refil');
-
 	}
-	public function firewall() {
+	public function firewall()
+	{
 		$firewall = new \App\Models\Iptables();
 		return view('firewall', ['rules' => $firewall->all()]);
 	}
 
-	public function addFirewall() {
+	public function addFirewall()
+	{
 		return view('addFirewall');
 	}
 
-	public function storeFirewall(Request $request) {
+	public function storeFirewall(Request $request)
+	{
 		$firewall = new \App\Models\Iptables();
 		$firewall->ip = $request->ip;
 		$ip = $request->ip;
@@ -745,7 +748,8 @@ class Controller extends BaseController
 		shell_exec("sudo /usr/sbin/iptables-restore < /var/www/html/sms-project/firewall/rulesFW.v4");
 		return redirect('/firewall');
 	}
-	public function deleteFirewall($id) {
+	public function deleteFirewall($id)
+	{
 		$firewall = new \App\Models\Iptables();
 		$IP = $firewall::findOrfail($id)->get();
 		/*		foreach($IP as $ip) {
@@ -787,10 +791,12 @@ class Controller extends BaseController
 		shell_exec("sudo /usr/sbin/iptables-restore < /var/www/html/sms-project/firewall/rulesFW.v4");
 		return redirect('/firewall');
 	}
-	public function sendSMS() {
+	public function sendSMS()
+	{
 		return view('sendSMS');
 	}
-	public function sendSMSGW(Request $request) {
+	public function sendSMSGW(Request $request)
+	{
 		$customer = new \App\Models\Customer();
 		$src = urlencode($request->origem);
 		$dst = urlencode($request->destino);
@@ -810,12 +816,13 @@ class Controller extends BaseController
 		$params .= '&dlr-url=http://127.0.0.1/dlr/index.php';
 		$response = file_get_contents($baseurl . $params);
 		return view('sendSMS', ['response' => $response]);
-
 	}
-	public function summaryCustomer() {
+	public function summaryCustomer()
+	{
 		return view('summaryCustomer');
 	}
-	public function summaryProvider() {
+	public function summaryProvider()
+	{
 		return view('summaryProvider');
 	}
 }

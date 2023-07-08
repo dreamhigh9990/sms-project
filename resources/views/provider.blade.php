@@ -15,7 +15,7 @@
 @extends('layouts.master')
 @section('content')
 <h1>Provider</h1>
-<a href="/provider/add" ype="button" class="btn btn-primary">Add Provider</a>
+<a href="/provider/add" type="button" class="btn btn-primary">Add Provider</a>
 <table class="table">
   <thead>
     <tr>
@@ -30,6 +30,9 @@
   </thead>
   <tbody>
     @foreach($providers as $provider)
+    @if(request('search') && !str_contains(strtolower($provider->name), strtolower(request('search'))))
+    @continue
+    @endif
     <tr>
       <td><a href="/provider/edit/{{ $provider->id }}" style="color: black">{{ $provider->name }}</a></td>
       <td>{{ $provider->address }}</td>
@@ -47,6 +50,7 @@
       </td>
     </tr>
     @endforeach
+    
   </tbody>
 </table>
 @endsection

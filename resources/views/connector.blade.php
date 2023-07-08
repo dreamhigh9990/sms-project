@@ -1,8 +1,8 @@
 <style>
-tbody tr:hover {
-  background-color: white;
-  color: black;
-}
+  tbody tr:hover {
+    background-color: white;
+    color: black;
+  }
 </style>
 @extends('layouts.master')
 @section('content')
@@ -12,26 +12,27 @@ tbody tr:hover {
   <thead>
     <tr>
       <th>Name</th>
-	<th>Status</th>
-	<th>Action</th>
+      <th>Status</th>
+      <th>Action</th>
       <th>Edit</th>
     </tr>
   </thead>
   <tbody>
-  @foreach($connectores as $connector)
-  @if (strpos($connector->name, $providerName) !== false)
+    @foreach($connectores as $connector)
+    @if (strpos($connector->name, $providerName) !== false)
     <tr>
       <td>{{ $connector->name }}</td>
       <td>{{ $connector->status }}</td>
-      <td><a href="/connector/start/{{ $connector }}" class="bi bi-play-circle-fill"></a>&ensp;&ensp;<a  href="/connector/stop/{{ $connector }}" class="bi bi-pause-circle"></a></td>
+      <td><a href="/connector/start/{{ $connector }}" class="bi bi-play-circle-fill"></a>&ensp;&ensp;<a href="/connector/stop/{{ $connector }}" class="bi bi-pause-circle"></a></td>
       <td>
-          <a href="/connector/edit/{{ $connector->id }}" class="bi bi-pencil-square"></a>
-          <form action="/connector/delete/{{ $connector->id }}" method="POST">
+        <a href="/connector/edit/{{ $connector->id }}" class="bi bi-pencil-square"></a>
+        <form action="/connector/delete/{{ $connector->id }}" method="POST">
           @csrf
           @method('delete')
           <button type="submit" style="color:red;" class="bi bi-trash3"></button>
-          </form>
+        </form>
       </td>
+
     </tr>
     @endif
     @endforeach
