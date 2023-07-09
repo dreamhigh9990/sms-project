@@ -15,6 +15,8 @@ use Illuminate\Http\Request;
 use Auth;
 use Khill\Lavacharts\Lavacharts;
 use DateTime;
+use App\Models\Iptables;
+use Illuminate\Support\Facades\DB;
 
 $lava = new Lavacharts; // See note below for Laravel
 class Controller extends BaseController
@@ -698,23 +700,25 @@ class Controller extends BaseController
 	}
 
 	public function storeFirewall(Request $request)
-	{
-		$firewall = new \App\Models\Iptables();
-		$firewall->ip = $request->ip;
-		$ip = $request->ip;
-		$firewall->identify = $request->desc;
-		$firewall->rule = $request->type;
-		$firewall->proto = $request->proto;
-		$firewall->port = $request->port;
-		$firewall->save();
-		if ($firewall->rule == True) {
-			$rule = 'ACCEPT';
-		} else {
-			$rule = 'DROP';
-		}
-		$db = pg_connect("host=localhost port=5432 dbname=sms user=sms password=Konnecting@39");
-		$result = pg_query($db, "SELECT * FROM iptables");
-		$myfile = fopen("/var/www/html/sms-project/firewall/rulesFW.v4", "w") or die("Unable to open file!");
+{
+    $firewall = new \App\Models\Iptables();
+    $firewall->ip = $request->ip;
+    $ip = $request->ip;
+    $firewall->identify = $request->desc;
+    $firewall->rule = $request->type;
+    $firewall->proto = $request->proto;
+    $firewall->port = $request->port;
+    $firewall->save();
+    if ($firewall->rule == True) {
+        $rule = 'ACCEPT';
+    } else {
+        $rule = 'DROP';
+    }
+    $result = DB::table('iptables')->get(); // Replace 'iptables' with your MySQL table name
+	if (!file_exists('/var/www/html/sms-project/firewall/')) {
+		mkdir('/var/www/html/sms-project/firewall/', 0777, true);
+	}
+    $myfile = fopen("/var/www/html/sms-project/firewall/rulesFW.v4", "w") or die("Unable to open file!");
 		$txt = "*filter\n
 :INPUT DROP [337085:33857280]\n
 :FORWARD ACCEPT [0:0]\n
@@ -723,18 +727,18 @@ class Controller extends BaseController
 -A INPUT -p tcp -m tcp --dport 40144 -j ACCEPT
 -A INPUT -p tcp -m tcp --dport 998 -j ACCEPT
 -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT\n";
-		fwrite($myfile, $txt);
-		while ($row = pg_fetch_assoc($result)) {
-			$ip = $row['ip'];
-			$rule = $row['rule'];
-			if ($rule == True) {
+    fwrite($myfile, $txt);
+		foreach ($result as $row) {
+			$ip = $row->ip;
+			$rule = $row->rule;
+			if ($rule == true) {
 				$rule = 'ACCEPT';
 			} else {
 				$rule = 'DROP';
 			}
-			$port = $row['port'];
-			$proto = $row['proto'];
-			$identify = $row['identify'];
+			$port = $row->port;
+			$proto = $row->proto;
+			$identify = $row->identify;
 			$txt = "###$identify\n";
 			fwrite($myfile, $txt);
 			$txt = "-A INPUT -s $ip -p $proto -m $proto --dport $port -j $rule\n";
@@ -744,7 +748,7 @@ class Controller extends BaseController
 		fwrite($myfile, $txt);
 		$proto = $request->proto;
 		$port = $request->port;
-		//		shell_exec("sudo /sbin/iptables -A INPUT -s $ip -p $proto -m $proto --dport $port -j $rule");
+			//		shell_exec("sudo /sbin/iptables -A INPUT -s $ip -p $proto -m $proto --dport $port -j $rule");
 		shell_exec("sudo /usr/sbin/iptables-restore < /var/www/html/sms-project/firewall/rulesFW.v4");
 		return redirect('/firewall');
 	}
@@ -758,8 +762,10 @@ class Controller extends BaseController
 		shell_exec("sudo /sbin/iptables -D INPUT $num");
  */
 		$firewall::findOrfail($id)->delete();
-		$db = pg_connect("host=localhost port=5432 dbname=sms user=sms password=Konnecting@39");
-		$result = pg_query($db, "SELECT * FROM iptables");
+		$result = DB::table('iptables')->get(); // Replace 'iptables' with your MySQL table name
+	if (!file_exists('/var/www/html/sms-project/firewall/')) {
+		mkdir('/var/www/html/sms-project/firewall/', 0777, true);
+	}
 		$myfile = fopen("/var/www/html/sms-project/firewall/rulesFW.v4", "w") or die("Unable to open file!");
 		$txt = "*filter\n
 :INPUT DROP [337085:33857280]\n
@@ -769,23 +775,23 @@ class Controller extends BaseController
 -A INPUT -p tcp -m tcp --dport 40144 -j ACCEPT
 -A INPUT -p tcp -m tcp --dport 998 -j ACCEPT
 -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT\n";
-		fwrite($myfile, $txt);
-		while ($row = pg_fetch_assoc($result)) {
-			$ip = $row['ip'];
-			$rule = $row['rule'];
-			if ($rule == True) {
-				$rule = 'ACCEPT';
-			} else {
-				$rule = 'DROP';
-			}
-			$port = $row['port'];
-			$proto = $row['proto'];
-			$identify = $row['identify'];
-			$txt = "###$identify\n";
-			fwrite($myfile, $txt);
-			$txt = "-A INPUT -s $ip -p $proto -m $proto --dport $port -j $rule\n";
-			fwrite($myfile, $txt);
-		}
+fwrite($myfile, $txt);
+foreach ($result as $row) {
+	$ip = $row->ip;
+	$rule = $row->rule;
+	if ($rule == true) {
+		$rule = 'ACCEPT';
+	} else {
+		$rule = 'DROP';
+	}
+	$port = $row->port;
+	$proto = $row->proto;
+	$identify = $row->identify;
+	$txt = "###$identify\n";
+	fwrite($myfile, $txt);
+	$txt = "-A INPUT -s $ip -p $proto -m $proto --dport $port -j $rule\n";
+	fwrite($myfile, $txt);
+}
 		$txt = "COMMIT\n";
 		fwrite($myfile, $txt);
 		shell_exec("sudo /usr/sbin/iptables-restore < /var/www/html/sms-project/firewall/rulesFW.v4");

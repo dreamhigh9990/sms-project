@@ -1,7 +1,13 @@
 <style>
-  tbody tr:hover {
-    background-color: white;
+ tbody tr:hover {
+    background-color: gray;
     color: black;
+  }
+  tbody tr {
+    background-color: white;
+  }
+  thead tr {
+    background-color: white;
   }
 </style>
 @extends('layouts.master')
@@ -14,7 +20,8 @@
       <th>Description</th>
       <th>IP/NET</th>
       <th>Rule</th>
-       <th>Port</th>
+      <th>Port</th>
+      <th>Action</th>
     </tr>
   </thead>
   <tbody>
