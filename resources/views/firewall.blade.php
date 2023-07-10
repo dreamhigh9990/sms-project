@@ -20,12 +20,15 @@
       <th>Description</th>
       <th>IP/NET</th>
       <th>Rule</th>
-      <th>Port</th>
-      <th>Action</th>
+       <th>Port</th>
+       <th>Action</th>
     </tr>
   </thead>
   <tbody>
     @foreach($rules as $customer)
+    @if(request('search') && !str_contains(strtolower($customer->identify), strtolower(request('search'))))
+    @continue
+    @endif
     <tr>
       <td>{{ $customer->identify }}</td>
       <td>{{ $customer->ip }}</td>
