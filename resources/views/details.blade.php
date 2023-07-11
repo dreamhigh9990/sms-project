@@ -17,8 +17,8 @@
 <div class="card-body"><strong>Provider Rate:</strong> <?php print_r($detail['ratedestprovider']);?></div>
 @endif
 <?php
-        $msg = substr($detail['short_message'], 2);
-	$hex=hex2bin($msg);
+    //     $msg = substr($detail['short_message'], 2);
+	// $hex=hex2bin($msg);
 ?>
 <div class="card-body"><strong>short_message:</strong> <?php echo $hex;?></div>
 <div class="card-body"><strong>Size Message:</strong> <?php print_r($detail['sizemessage']);?></div>

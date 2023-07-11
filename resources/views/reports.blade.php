@@ -1,18 +1,19 @@
 
 <style>
-tbody tr:hover {
-  background-color: white;
-  color: black;
-}
-tfoot input {
-        width: 100%;
-        padding: 3px;
-        box-sizing: border-box;
-    }
+  tbody tr:hover {
+    background-color: #D3D3D3;
+    color: black;
+  }
+  tbody tr {
+    background-color: white;
+  }
+  thead tr {
+    background-color: white;
+  }
 </style>
 @extends('layouts.master')
 @section('content')
-<h1>Reports</h1>
+<h1><a href="https://134.119.220.178/u22/asr_acd.php">Reports</a></h1>
 <table id="example" style="border-collapse: collapse;font-size:12px;text-align: left;" class="table">
   <thead>
     <tr>
@@ -36,12 +37,12 @@ tfoot input {
       <td>{{ $report->source_addr }}</td>
       <td>{{ $report->destination_addr }}</td>
 <?php 
-$msg = substr($report->short_message, 2);
-	if (trim($msg, '0..9A..Fa..f') == '') {
-		$hex=hex2bin($msg);
-	}
+// $msg = substr($report->short_message, 2);
+// 	if (trim($msg, '0..9A..Fa..f') == '') {
+// 		$hex=hex2bin($msg);
+// 	}
 ?>
-      <td>{{ $hex }}</td>
+      <td>{{ $report->short_message }}</td>
       <td>{{ $report->status }}</td>
     </tr>
     @endforeach
