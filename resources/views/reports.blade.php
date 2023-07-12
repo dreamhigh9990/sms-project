@@ -13,7 +13,7 @@
 </style>
 @extends('layouts.master')
 @section('content')
-<h1><a href="https://134.119.220.178/u22/asr_acd.php">Reports</a></h1>
+<h1><a href="https://134.119.220.178/u22/asr_acd.php" style="color: black;">Reports</a></h1>
 <table id="example" style="border-collapse: collapse;font-size:12px;text-align: left;" class="table">
   <thead>
     <tr>
@@ -25,14 +25,26 @@
       <th>Destination Address</th>
       <th>Message</th>
       <th>status</th>
+      <th>smpp-msgid</th>
     </tr>
   </thead>
   <tbody>
     @foreach($reports as $report)
+    @if (request('search') && !(str_contains(strtolower($report->created_at), strtolower(request('search'))) ||
+        str_contains(strtolower($report->uid), strtolower(request('search'))) ||
+        str_contains(strtolower($report->msgid), strtolower(request('search'))) ||
+        str_contains(strtolower($report->source_connector), strtolower(request('search'))) ||
+        str_contains(strtolower($report->source_addr), strtolower(request('search'))) ||
+        str_contains(strtolower($report->destination_addr), strtolower(request('search'))) ||
+        str_contains(strtolower($report->short_message), strtolower(request('search'))) ||
+        str_contains(strtolower($report->status), strtolower(request('search'))) ||
+        str_contains(strtolower($report->smsgid), strtolower(request('search')))))
+    @continue
+    @endif
     <tr>
       <td>{{ $report->created_at }}</td>
       <td>{{ $report->uid }}</td>
-      <td><a href="/details/{{ $report->msgid }}" target="_blank">{{ $report->msgid }}</a></td>
+      <td><a href="/details/{{ $report->msgid }}" style="color: black;">{{ $report->msgid }}</a></td>
       <td>{{ $report->source_connector }}</td>
       <td>{{ $report->source_addr }}</td>
       <td>{{ $report->destination_addr }}</td>
@@ -44,6 +56,7 @@
 ?>
       <td>{{ $report->short_message }}</td>
       <td>{{ $report->status }}</td>
+      <td>{{ $report->smsgid }}</td>
     </tr>
     @endforeach
   </tbody>
