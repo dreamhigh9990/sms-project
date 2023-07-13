@@ -22,7 +22,7 @@
 // //$newstring = $customerName;
 $newstring = $customerName;
 $pos = strpos($customerName, '_', 0); // $pos = 7, not 0
-echo $pos;
+// echo $pos;
 if ($pos && $pos >= 0) {
   $newstring = substr($customerName, 0, $pos);
 }
