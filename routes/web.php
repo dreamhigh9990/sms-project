@@ -24,6 +24,8 @@ Route::delete('/customer/delete/{id}', [Controller::class, 'destroyCustomer']);
 Route::get('/customer/edit/{id}', [Controller::class, 'editCustomer']);
 Route::put('/customer/update/{id}', [Controller::class, 'updateCustomer']);
 
+Route::get('/customer-bind', [Controller::class, 'customerBind']);
+
 Route::get('/provider', [Controller::class, 'provider']);
 Route::post('/provider', [Controller::class, 'storeProvider']);
 Route::get('/provider/add', [Controller::class, 'addProvider']);

@@ -39,6 +39,19 @@ class Controller extends BaseController
 			return view('customer', ['customers' => $customer->all()]);
 		}
 	}
+	public function customerBind(request $request)
+	{
+		$customer = new \App\Models\Customer();
+		$customerName = $request->query('customer');
+		if (auth()->user()->profile == 4) {
+			$sales_customers = auth()->user()->sales_customers;
+			$sales_customers = explode(";", $sales_customers);
+			$customers = $customer::whereIn('id', $sales_customers)->get();
+			return view('customer-bind', ['customers' => $customers, 'customerName' => $customerName]);
+		} else {
+			return view('customer-bind', ['customers' => $customer->all(), 'customerName' => $customerName]);
+		}
+	}
 	public function ratesProvider()
 	{
 		$rates = new \App\Models\RateProvider();
