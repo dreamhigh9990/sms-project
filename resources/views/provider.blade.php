@@ -1,6 +1,6 @@
 <style>
   tbody tr:hover {
-    background-color: gray;
+    background-color: #D3D3D3;
     color: black;
   }
 

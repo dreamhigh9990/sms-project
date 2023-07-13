@@ -33,10 +33,10 @@ class Controller extends BaseController
 		if (auth()->user()->profile == 4) {
 			$sales_customers = auth()->user()->sales_customers;
 			$sales_customers = explode(";", $sales_customers);
-			$customers = $customer::whereIn('id', $sales_customers)->get();
+			$customers = $customer::whereIn('id', $sales_customers)::orderBy('uid')->get();
 			return view('customer', ['customers' => $customers]);
 		} else {
-			return view('customer', ['customers' => $customer->all()]);
+			return view('customer', ['customers' => $customer::orderBy('uid')->get()]);
 		}
 	}
 	public function customerBind(request $request)

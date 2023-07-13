@@ -1,6 +1,6 @@
 <style>
   tbody tr:hover {
-    background-color: gray;
+    background-color: #D3D3D3;
     color: black;
   }
 
@@ -32,12 +32,14 @@
   </thead>
   <tbody>
     @foreach($customers as $customer)
-    @if(request('search') && !str_contains(strtolower($customer->name), strtolower(request('search'))))
+    @if (request('search') && !(str_contains(strtolower($customer->uid), strtolower(request('search'))) ||
+        str_contains(strtolower($customer->name), strtolower(request('search'))) ||
+        str_contains(strtolower($customer->company), strtolower(request('search')))))
     @continue
     @endif
       <td>{{ $customer->id }}</td>
       <!-- <td>{{ $customer->uid }}</td> -->
-      <td><a href="/customer-bind?customer={{ $customer->uid }}" style="color: black; text-decoration-line: underline">{{ $customer->uid }}</a></td>
+      <td><a href="/customer-bind?customer={{ $customer->uid }}" style="color: black;">{{ $customer->uid }}</a></td>
       <td>{{ $customer->name }}</td>
       <td>{{ $customer->company }}</td>
       @if ($customer->profile == 1)

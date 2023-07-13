@@ -1,7 +1,15 @@
 <style>
   tbody tr:hover {
-    background-color: white;
+    background-color: #D3D3D3;
     color: black;
+  }
+
+  tbody tr {
+    background-color: white;
+  }
+
+  thead tr {
+    background-color: white;
   }
 </style>
 @extends('layouts.master')
