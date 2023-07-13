@@ -1,7 +1,15 @@
 <style>
   tbody tr:hover {
-    background-color: white;
+    background-color: gray;
     color: black;
+  }
+
+  tbody tr {
+    background-color: white;
+  }
+
+  thead tr {
+    background-color: white;
   }
 </style>
 @extends('layouts.master')
@@ -24,6 +32,9 @@
   </thead>
   <tbody>
     @foreach($customers as $customer)
+    @if(request('search') && !str_contains(strtolower($customer->name), strtolower(request('search'))))
+    @continue
+    @endif
       <td>{{ $customer->id }}</td>
       <td>{{ $customer->uid }}</td>
       <td>{{ $customer->name }}</td>
