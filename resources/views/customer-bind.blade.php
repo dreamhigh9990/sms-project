@@ -14,20 +14,19 @@
 </style>
 @extends('layouts.master')
 @section('content')
-<h1>Customer</h1>
-@if (auth()->user()->profile == 1)
-<a href="/customer/add" ype="button" class="btn btn-primary">Add Customer</a>
-@endif
+<h1>Customers binded</h1>
 
 <?php
 // We can search for the character, ignoring anything before the offset
 // $newstring = 'abcdef abcdef';
 // //$newstring = $customerName;
+$newstring = $customerName;
 $pos = strpos($customerName, '_', 0); // $pos = 7, not 0
-$newstring = substr($customerName, 0, $pos);
-echo $newstring;
+echo $pos;
+if ($pos && $pos >= 0) {
+  $newstring = substr($customerName, 0, $pos);
+}
 ?>
-
 <table class="table">
   <thead>
     <tr>

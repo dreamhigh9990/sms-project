@@ -178,8 +178,9 @@ class Controller extends BaseController
 			$selectCustomer = $request->selectCustomer;
 		}
 		$customer->sales_customers = $selectCustomer;
+		$customer->sales_customers = "";
 		$customer->save();
-		shell_exec("python3 /opt/jasmin/cli/createUser.py '$request->uid' '$request->uidpass' '$request->tps'");
+		// shell_exec("python3 /opt/jasmin/cli/createUser.py '$request->uid' '$request->uidpass' '$request->tps'");
 		return redirect('/customer');
 	}
 	public function storeProvider(Request $request)
