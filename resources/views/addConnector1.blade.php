@@ -3,7 +3,6 @@
 <h1>Add Customer</h1>
 <form action="/customer" method="POST">
   @csrf
-  <!-- 
   <div class="form-group">
     <label for="uid">SMPP User:</label>
     <input required type="text" class="form-control" id="uid" placeholder="Enter UID" name="uid">
@@ -12,7 +11,6 @@
     <label for="uid">SMPP Password (Max Length 8):</label>
     <input required type="text" class="form-control" id="uidpass" placeholder="Enter Password" name="uidpass" maxlength="8">
   </div>
- -->
   <div class="form-group">
     <label for="pwd">Name:</label>
     <input required type="text" class="form-control" id="name" placeholder="Enter Name" name="name">
@@ -48,7 +46,7 @@
 	<div id="profileDiv" style="display : none;"> Select Customers:         
 		<select class="form-select" id="companySales" name="companySales">
 			<option value=""></option>
-			 @foreach($customers as $customer)
+			 @foreach($providers as $customer)
 				@if ($customer->profile == 3)
 	                		<option value="<?php echo $customer->id?>"><?php echo $customer->id . " : " . $customer->name . "  -  " .$customer->uid?></option>
 				@endif
@@ -58,10 +56,10 @@
 	</div>
   </div>
 
-  <!-- <div class="form-group">
+  <div class="form-group">
     <label for="pwd">TPS:</label>
     <input required type="number" class="form-control" id="tps" placeholder="Throughput Per Second" name="tps">
-  </div>   --> 
+  </div>  
   <button type="submit" class="btn btn-success">Submit</button> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="/customer" ype="button" class="btn btn-default">Cancel</a>
 </form>
 <script>

@@ -22,7 +22,9 @@
   <thead>
     <tr>
       <th>ID</th>
+      <!-- 
       <th>UID</th>
+       -->
       <th>NAME</th>
       <th>Company</th>
       <th>Profile</th>
@@ -39,7 +41,9 @@
     @endif
       <td>{{ $customer->id }}</td>
       <!-- <td>{{ $customer->uid }}</td> -->
+      <!--
       <td><a href="/customer-bind?customer={{ $customer->uid }}" style="color: black;">{{ $customer->uid }}</a></td>
+      -->
       <td>{{ $customer->name }}</td>
       <td>{{ $customer->company }}</td>
       @if ($customer->profile == 1)
@@ -57,12 +61,21 @@
       <td>{{$customer->balance}}</td>
 @if (auth()->user()->profile == 1)
       <td>
-          <a href="/customer/edit/{{ $customer->id }}" class="bi bi-pencil-square"></a>
-          <form action="/customer/delete/{{ $customer->id }}" method="POST">
-          @csrf
-          @method('delete')
-          <button type="submit" style="color:red;" class="bi bi-trash3"></button>
-          </form>
+        <ul style="list-style-type: none;">
+          <li style="display: inline-block;">
+            <div style="text-decoration-line: underline; float:left">
+              <a href="/connector?provider={{ $customer->name }}" style="color: black; text-decoration-line: underline">Open Connections</a>
+            </div>
+          </li>
+          <li style="display: inline-block;">
+            <a href="/customer/edit/{{ $customer->id }}" class="bi bi-pencil-square"></a>
+            <form action="/customer/delete/{{ $customer->id }}" method="POST">
+            @csrf
+            @method('delete')
+            <button type="submit" style="color:red;" class="bi bi-trash3"></button>
+            </form>
+          </li>
+        </ul>
       </td>
 @endif
     </tr>
