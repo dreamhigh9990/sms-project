@@ -21,14 +21,15 @@
 <table class="table">
   <thead>
     <tr>
-      <th>ID</th>
+      <!-- <th>ID</th> -->
       <!-- 
       <th>UID</th>
        -->
-      <th>NAME</th>
+      <!-- <th>NAME</th> -->
       <th>Company</th>
       <th>Profile</th>
       <th>Balance $</th>
+      <th>AM names</th>
       <th>Actions</th>
     </tr>
   </thead>
@@ -39,13 +40,13 @@
         str_contains(strtolower($customer->company), strtolower(request('search')))))
     @continue
     @endif
-      <td>{{ $customer->id }}</td>
+      <!-- <td>{{ $customer->id }}</td> -->
       <!-- <td>{{ $customer->uid }}</td> -->
       <!--
       <td><a href="/customer-bind?customer={{ $customer->uid }}" style="color: black;">{{ $customer->uid }}</a></td>
       -->
       <!-- <td>{{ $customer->name }}</td> -->
-      <td><a href="/sales-bind?customer={{ $customer->id }}" style="color: black;">{{ $customer->name }}</a></td>
+      <!-- <td><a href="/sales-bind?customer={{ $customer->id }}" style="color: black;">{{ $customer->name }}</a></td> -->
       <td>{{ $customer->company }}</td>
       @if ($customer->profile == 1)
       <td>Administrator</td>
@@ -60,6 +61,7 @@
       <td>Sales</td>
       @endif
       <td>{{$customer->balance}}</td>
+      <td>{{$customer->salenames}}</td>
 @if (auth()->user()->profile == 1)
       <td>
         <ul style="list-style-type: none;">

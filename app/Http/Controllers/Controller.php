@@ -33,10 +33,28 @@ class Controller extends BaseController
 		if (auth()->user()->profile == 4) {
 			$sales_customers = auth()->user()->sales_customers;
 			$sales_customers = explode(";", $sales_customers);
-			$customers = $customer::whereIn('id', $sales_customers)::orderBy('uid')->get();
+			$customers = $customer::whereIn('id', $sales_customers)->orderBy('uid')->get();
 			return view('customer', ['customers' => $customers]);
 		} else {
-			return view('customer', ['customers' => $customer::orderBy('uid')->get()]);
+
+			$ccustomers = $customer::orderBy('uid')->get();
+
+			foreach ($ccustomers as $cuser) {
+				$salers = $cuser->sales_customers;
+				$salers = explode(";", $salers);
+
+				$customs = $customer::whereIn('id', $salers)->orderBy('uid')->get();
+
+				$names = "";
+				if ($cuser->profile != 4) {
+					foreach ($customs as $cc) {
+						$names = $names . $cc->name . ", ";
+					}
+				}
+				$cuser->salenames = substr($names, 0, -2);
+			}
+
+			return view('customer', ['customers' => $ccustomers]);
 		}
 	}
 	public function customerBind(request $request)
@@ -67,7 +85,7 @@ class Controller extends BaseController
 			$sales_customers = explode(";", $sales_customers);
 			$customers = $customer::whereIn('id', $sales_customers)->get();
 			return view('sales', ['customers' => $customers, 'customerName' => $customerName]);
-		} else if ($selected_customer->profile == 1){
+		} else if ($selected_customer->profile == 1) {
 			$sales_customers = $selected_customer->sales_customers;
 			$sales_customers = explode(";", $sales_customers);
 			$customers = $customer::whereIn('id', $sales_customers)->get();
@@ -123,14 +141,14 @@ class Controller extends BaseController
 		return redirect('/rates-provider');
 	}
 	/*public function updateProvider(Request $request) {
-		$rates = new \App\Models\RateProvider();
-                $rates::where('id',$request->id)->update([
-                        'code' => $request->code,
-                        'destination' => $request->destination,
-                        'company' => $request->company,
-                        'cost' => $request->cost]);
-                return redirect('/rates-provider');
-	}*/
+		   $rates = new \App\Models\RateProvider();
+				   $rates::where('id',$request->id)->update([
+						   'code' => $request->code,
+						   'destination' => $request->destination,
+						   'company' => $request->company,
+						   'cost' => $request->cost]);
+				   return redirect('/rates-provider');
+	   }*/
 	public function editRatesProvider($id)
 	{
 		//$provider = new \App\Models\Provider();
@@ -171,19 +189,19 @@ class Controller extends BaseController
 	}
 	public function deleteRateCustomer($id)
 	{
-		$provider = new  \App\Models\RateCustomer();
+		$provider = new \App\Models\RateCustomer();
 		$provider::findOrfail($id)->delete();
 		return redirect('/rates-customer');
 	}
 	public function deleteRateProvider($id)
 	{
-		$provider = new  \App\Models\RateProvider();
+		$provider = new \App\Models\RateProvider();
 		$provider::findOrfail($id)->delete();
 		return redirect('/rates-provider');
 	}
 	public function storeCustomer(Request $request)
 	{
-		$customer = new  \App\Models\Customer();
+		$customer = new \App\Models\Customer();
 		$customer->uid = $request->uid;
 		$customer->smpppass = $request->uidpass;
 		$customer->name = $request->name;
@@ -210,7 +228,7 @@ class Controller extends BaseController
 	}
 	public function storeProvider(Request $request)
 	{
-		$provider = new  \App\Models\Provider();
+		$provider = new \App\Models\Provider();
 		$provider->name = $request->name;
 		$provider->email = $request->email;
 		$provider->password = $request->password;
@@ -233,18 +251,18 @@ class Controller extends BaseController
 	}
 	public function editProvider($id)
 	{
-		$provider = new  \App\Models\Provider();
+		$provider = new \App\Models\Provider();
 		return view('editProvider', ['providers' => $provider::findOrfail($id)]);
 	}
 	public function editCustomer($id)
 	{
-		$customer = new  \App\Models\Customer();
+		$customer = new \App\Models\Customer();
 		$customer = $customer::findOrfail($id);
 		return view('editCustomer', ['customers' => $customer::findOrfail($id), 'customersAll' => $customer->all()]);
 	}
 	public function editConnector($id)
 	{
-		$provider =  new \App\Models\Provider();
+		$provider = new \App\Models\Provider();
 		$connectors = new \App\Models\Connectors();
 		$providerID = $connectors::where('name', $id)->get(['provider']);
 		$infoConn = shell_exec("python3 /opt/jasmin/cli/getConnector.py $id");
@@ -279,7 +297,7 @@ class Controller extends BaseController
 
 	public function updateCustomer(Request $request)
 	{
-		$customer = new  \App\Models\Customer();
+		$customer = new \App\Models\Customer();
 		$uid = $customer::findOrfail($request->id)->get();
 		foreach ($uid as $uidUser) {
 			$uidOldGet = $uidUser->uid;
@@ -347,7 +365,7 @@ class Controller extends BaseController
 	public function destroyCustomer($id)
 	{
 		$rates = new \App\Models\RateCustomer();
-		$customer = new  \App\Models\Customer();
+		$customer = new \App\Models\Customer();
 		shell_exec("python3 /opt/jasmin/cli/deleteUser.py '$id'");
 		$customer::findOrfail($id)->delete();
 		$rates::where('company', $id)->delete();
@@ -355,7 +373,7 @@ class Controller extends BaseController
 	}
 	public function destroyProvider($id)
 	{
-		$provider = new  \App\Models\Provider();
+		$provider = new \App\Models\Provider();
 		$provider::findOrfail($id)->delete();
 		return redirect('/provider');
 	}
@@ -393,21 +411,21 @@ class Controller extends BaseController
 				$query = $reports->orderBy('created_at', 'desc')->paginate(15);
 			} else
 				if (validateDateHour($search)) {
-				$query = $reports::where('created_at', "$search")
-					->paginate(15);
-			} else if (validateDateYear($search)) {
-				$query = $reports::where('created_at', 'LIKE', "$search%")
-					->paginate(15);
-			} else {
-				$query = $reports::where('msgid', "$search")
-					->orWhere('source_connector', "$search")
-					->orWhere('routed_cid', "$search")
-					->orWhere('source_addr', "$search")
-					->orWhere('destination_addr', "$search")
-					->orWhere('short_message', "$search")
-					->orWhere('uid', "$search")
-					->paginate(15);
-			}
+					$query = $reports::where('created_at', "$search")
+						->paginate(15);
+				} else if (validateDateYear($search)) {
+					$query = $reports::where('created_at', 'LIKE', "$search%")
+						->paginate(15);
+				} else {
+					$query = $reports::where('msgid', "$search")
+						->orWhere('source_connector', "$search")
+						->orWhere('routed_cid', "$search")
+						->orWhere('source_addr', "$search")
+						->orWhere('destination_addr', "$search")
+						->orWhere('short_message', "$search")
+						->orWhere('uid', "$search")
+						->paginate(15);
+				}
 		} else {
 			$query = $reports->orderBy('created_at', 'desc')->paginate(15);
 		}
@@ -466,9 +484,9 @@ class Controller extends BaseController
 		///////////////////
 		$providerName = $request->query('provider');
 		$provider = new \App\Models\Connectors();
-		
+
 		return view('connector', ['connectores' => $provider->all(), 'providerName' => $providerName]);
-		
+
 	}
 	public function addConnector()
 	{
@@ -567,16 +585,16 @@ class Controller extends BaseController
 	public function dashboardAPI()
 	{
 		\DB::enableQueryLog(); // Enable query log
-		$customer = new  \App\Models\Submit_log();
+		$customer = new \App\Models\Submit_log();
 		$countSMS = $_GET['countSMS'];
 		if (is_null($_GET['customer'])) {
-			$uid =  auth()->user()->uid;
+			$uid = auth()->user()->uid;
 		} else {
 			$uid = $_GET['customer'];
 		}
 		$profile = auth()->user()->profile;
 		//if ($profile == 3) {
-		if ($countSMS ==  'day') {
+		if ($countSMS == 'day') {
 			$statusDelivered = $customer::where('status', 'like', 'DELI%')->where("uid", "$uid")->whereDate('created_at', Carbon::today())->get()->count();
 			$statusFailure = $customer::where("uid", "$uid")->whereDate('created_at', Carbon::today())->where(function ($query) {
 				$query->where('status', 'like', 'REJ%')->orWhere('status', 'like', 'UND%')->orWhere('status', 'like', 'FAIL%');
@@ -585,17 +603,17 @@ class Controller extends BaseController
 			$statusOthers = $customer::where('status', '!=', 'CommandStatus.ESME_ROK')->where('status', '!=', 'CommandStatus.')->where("uid", "$uid")->whereDate('created_at', Carbon::today())->get()->count();
 			//dd(\DB::getQueryLog()); // Show results of log
 		}
-		if ($countSMS ==  'month') {
+		if ($countSMS == 'month') {
 			\DB::enableQueryLog(); // Enable query log
-			$statusDelivered = $customer::where('status', 'like', 'DELI%')->where("uid", "$uid")->where('created_at', 'LIKE', Carbon::now()->year . '-' .  date('m') . '%')->get()->count();
+			$statusDelivered = $customer::where('status', 'like', 'DELI%')->where("uid", "$uid")->where('created_at', 'LIKE', Carbon::now()->year . '-' . date('m') . '%')->get()->count();
 			$statusFailure = $customer::where("uid", "$uid")->where('created_at', 'LIKE', Carbon::now()->year . '-' . date('m') . '%')->where(function ($query) {
 				$query->where('status', 'like', 'REJ%')->orWhere('status', 'like', 'UND%')->orWhere('status', 'like', 'FAIL%');
 			})->get()->count();
 			$statusOk = $customer::where('status', 'CommandStatus.ESME_ROK')->where("uid", "$uid")->where('created_at', 'LIKE', Carbon::now()->year . '-' . date('m') . '%')->get()->count();
-			$statusOthers = $customer::where('status', '!=', 'CommandStatus.ESME_ROK')->where('status', '!=', 'CommandStatus.')->where("uid", "$uid")->where('created_at', 'LIKE', Carbon::now()->year . '-' .  date('m') . '%')->get()->count();
+			$statusOthers = $customer::where('status', '!=', 'CommandStatus.ESME_ROK')->where('status', '!=', 'CommandStatus.')->where("uid", "$uid")->where('created_at', 'LIKE', Carbon::now()->year . '-' . date('m') . '%')->get()->count();
 			//dd(\DB::getQueryLog());
 		}
-		if ($countSMS ==  'year') {
+		if ($countSMS == 'year') {
 			$statusDelivered = $customer::where('status', 'like', 'DELI%')->where("uid", "$uid")->whereYear('created_at', Carbon::now()->year)->get()->count();
 			$statusFailure = $customer::where("uid", "$uid")->whereYear('created_at', Carbon::now()->year)->where(function ($query) {
 				$query->where('status', 'like', 'REJ%')->orWhere('status', 'like', 'UND%')->orWhere('status', 'like', 'FAIL%');
@@ -605,37 +623,37 @@ class Controller extends BaseController
 		}
 		//} else {
 		/*	if ($countSMS ==  'day') {
-				$statusDelivered = $customer::where('status','like','DELI%')->whereDate('created_at', Carbon::today())->get()->count();
-				$statusFailure = $customer::whereDate('created_at', Carbon::today())->where(function($query) {
-					$query->where('status','like','REJ%')->orWhere('status','like','UND%')->orWhere('status','like','FAIL%');})->get()->count();
-					$statusOk = $customer::where('status','CommandStatus.ESME_ROK')->whereDate('created_at', Carbon::today())->get()->count();
-					$statusOthers = $customer::where('status','!=','CommandStatus.ESME_ROK')->where('status','!=','CommandStatus.')->whereDate('created_at', Carbon::today())->get()->count();
-					//				  dd(\DB::getQueryLog()); // Show results of log
-			}
-			if ($countSMS ==  'month') {
-				\DB::enableQueryLog(); // Enable query log
-				$statusDelivered = $customer::where('status','like','DELI%')->where('created_at','LIKE',Carbon::now()->year.'-'.  date('m') .'%')->get()->count();
-				$statusFailure = $customer::where('created_at','LIKE',Carbon::now()->year.'-'. date('m') .'%')->where(function($query) {
-					$query->where('status','like','REJ%')->orWhere('status','like','UND%')->orWhere('status','like','FAIL%');})->get()->count();
-					$statusOk = $customer::where('status','CommandStatus.ESME_ROK')->where('created_at','LIKE',Carbon::now()->year.'-'. date('m').'%')->get()->count();
-					$statusOthers = $customer::where('status','!=','CommandStatus.ESME_ROK')->where('status','!=','CommandStatus.')->where('created_at', 'LIKE',Carbon::now()->year.'-'.  date('m') .'%')->get()->count();
-					//dd(\DB::getQueryLog());
-			}
-			if ($countSMS ==  'year') {
-				$statusDelivered = $customer::where('status','like','DELI%')->whereYear('created_at',Carbon::now()->year)->get()->count();
-				$statusFailure = $customer::where("uid","$uid")->whereYear('created_at',Carbon::now()->year)->where(function($query) {
-					$query->where('status','like','REJ%')->orWhere('status','like','UND%')->orWhere('status','like','FAIL%');})->get()->count();
-					$statusOk = $customer::where('status','CommandStatus.ESME_ROK')->whereYear('created_at', Carbon::now()->year)->get()->count();
-					$statusOthers = $customer::where('status','!=','CommandStatus.ESME_ROK')->where('status','!=','CommandStatus.')->where("uid","$uid")->whereYear('created_at', Carbon::now()->year)->get()->count();
-			}	
-		}
-		*/
+					  $statusDelivered = $customer::where('status','like','DELI%')->whereDate('created_at', Carbon::today())->get()->count();
+					  $statusFailure = $customer::whereDate('created_at', Carbon::today())->where(function($query) {
+						  $query->where('status','like','REJ%')->orWhere('status','like','UND%')->orWhere('status','like','FAIL%');})->get()->count();
+						  $statusOk = $customer::where('status','CommandStatus.ESME_ROK')->whereDate('created_at', Carbon::today())->get()->count();
+						  $statusOthers = $customer::where('status','!=','CommandStatus.ESME_ROK')->where('status','!=','CommandStatus.')->whereDate('created_at', Carbon::today())->get()->count();
+						  //				  dd(\DB::getQueryLog()); // Show results of log
+				  }
+				  if ($countSMS ==  'month') {
+					  \DB::enableQueryLog(); // Enable query log
+					  $statusDelivered = $customer::where('status','like','DELI%')->where('created_at','LIKE',Carbon::now()->year.'-'.  date('m') .'%')->get()->count();
+					  $statusFailure = $customer::where('created_at','LIKE',Carbon::now()->year.'-'. date('m') .'%')->where(function($query) {
+						  $query->where('status','like','REJ%')->orWhere('status','like','UND%')->orWhere('status','like','FAIL%');})->get()->count();
+						  $statusOk = $customer::where('status','CommandStatus.ESME_ROK')->where('created_at','LIKE',Carbon::now()->year.'-'. date('m').'%')->get()->count();
+						  $statusOthers = $customer::where('status','!=','CommandStatus.ESME_ROK')->where('status','!=','CommandStatus.')->where('created_at', 'LIKE',Carbon::now()->year.'-'.  date('m') .'%')->get()->count();
+						  //dd(\DB::getQueryLog());
+				  }
+				  if ($countSMS ==  'year') {
+					  $statusDelivered = $customer::where('status','like','DELI%')->whereYear('created_at',Carbon::now()->year)->get()->count();
+					  $statusFailure = $customer::where("uid","$uid")->whereYear('created_at',Carbon::now()->year)->where(function($query) {
+						  $query->where('status','like','REJ%')->orWhere('status','like','UND%')->orWhere('status','like','FAIL%');})->get()->count();
+						  $statusOk = $customer::where('status','CommandStatus.ESME_ROK')->whereYear('created_at', Carbon::now()->year)->get()->count();
+						  $statusOthers = $customer::where('status','!=','CommandStatus.ESME_ROK')->where('status','!=','CommandStatus.')->where("uid","$uid")->whereYear('created_at', Carbon::now()->year)->get()->count();
+				  }	
+			  }
+			  */
 		$data = [
 			'delivered' => $statusDelivered,
 			'failure' => $statusFailure,
-			'ok'   => $statusOk,
+			'ok' => $statusOk,
 			'others' => $statusOthers,
-			'type'  => $countSMS,
+			'type' => $countSMS,
 
 		];
 
@@ -647,9 +665,9 @@ class Controller extends BaseController
 		if (!isset(auth()->user()->uid)) {
 			return redirect('/login');
 		}
-		$customer = new  \App\Models\Submit_log();
-		$uid =  auth()->user()->uid;
-		$profile =  auth()->user()->profilei;
+		$customer = new \App\Models\Submit_log();
+		$uid = auth()->user()->uid;
+		$profile = auth()->user()->profilei;
 
 		$statusOk = $customer::where('status', 'OK')->where("uid", "$uid")->get()->count();
 		$statusDelivered = $customer::where('status', 'DELI%')->where("uid", "$uid")->get()->count();
@@ -705,7 +723,7 @@ class Controller extends BaseController
 	}
 	public function addInvoice()
 	{
-		$customer = new  \App\Models\Customer();
+		$customer = new \App\Models\Customer();
 		return view('addInvoice', ['customers' => $customer->all()]);
 	}
 	public function storeInvoices(Request $request)
@@ -719,7 +737,7 @@ class Controller extends BaseController
 	}
 	public function updateRefill(Request $request)
 	{
-		$customer = new  \App\Models\Customer();
+		$customer = new \App\Models\Customer();
 		$rate = $customer::where('id', $request->id)->value('balance') + $request->refillValue;
 		$customer::where('id', $request->id)->update([
 			'balance' => $rate
@@ -739,25 +757,25 @@ class Controller extends BaseController
 	}
 
 	public function storeFirewall(Request $request)
-{
-    $firewall = new \App\Models\Iptables();
-    $firewall->ip = $request->ip;
-    $ip = $request->ip;
-    $firewall->identify = $request->desc;
-    $firewall->rule = $request->type;
-    $firewall->proto = $request->proto;
-    $firewall->port = $request->port;
-    $firewall->save();
-    if ($firewall->rule == True) {
-        $rule = 'ACCEPT';
-    } else {
-        $rule = 'DROP';
-    }
-    $result = DB::table('iptables')->get(); // Replace 'iptables' with your MySQL table name
-	if (!file_exists('/var/www/html/sms-project/firewall/')) {
-		mkdir('/var/www/html/sms-project/firewall/', 0777, true);
-	}
-    $myfile = fopen("/var/www/html/sms-project/firewall/rulesFW.v4", "w") or die("Unable to open file!");
+	{
+		$firewall = new \App\Models\Iptables();
+		$firewall->ip = $request->ip;
+		$ip = $request->ip;
+		$firewall->identify = $request->desc;
+		$firewall->rule = $request->type;
+		$firewall->proto = $request->proto;
+		$firewall->port = $request->port;
+		$firewall->save();
+		if ($firewall->rule == True) {
+			$rule = 'ACCEPT';
+		} else {
+			$rule = 'DROP';
+		}
+		$result = DB::table('iptables')->get(); // Replace 'iptables' with your MySQL table name
+		if (!file_exists('/var/www/html/sms-project/firewall/')) {
+			mkdir('/var/www/html/sms-project/firewall/', 0777, true);
+		}
+		$myfile = fopen("/var/www/html/sms-project/firewall/rulesFW.v4", "w") or die("Unable to open file!");
 		$txt = "*filter\n
 :INPUT DROP [337085:33857280]\n
 :FORWARD ACCEPT [0:0]\n
@@ -766,7 +784,7 @@ class Controller extends BaseController
 -A INPUT -p tcp -m tcp --dport 40144 -j ACCEPT
 -A INPUT -p tcp -m tcp --dport 998 -j ACCEPT
 -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT\n";
-    fwrite($myfile, $txt);
+		fwrite($myfile, $txt);
 		foreach ($result as $row) {
 			$ip = $row->ip;
 			$rule = $row->rule;
@@ -787,7 +805,7 @@ class Controller extends BaseController
 		fwrite($myfile, $txt);
 		$proto = $request->proto;
 		$port = $request->port;
-			//		shell_exec("sudo /sbin/iptables -A INPUT -s $ip -p $proto -m $proto --dport $port -j $rule");
+		//		shell_exec("sudo /sbin/iptables -A INPUT -s $ip -p $proto -m $proto --dport $port -j $rule");
 		shell_exec("sudo /usr/sbin/iptables-restore < /var/www/html/sms-project/firewall/rulesFW.v4");
 		return redirect('/firewall');
 	}
@@ -796,15 +814,15 @@ class Controller extends BaseController
 		$firewall = new \App\Models\Iptables();
 		$IP = $firewall::findOrfail($id)->get();
 		/*		foreach($IP as $ip) {
-			$num=shell_exec("sudo /sbin/iptables -L -n -v --line-numbers | grep '$ip->ip' |awk {'print $1'}");
-		}
-		shell_exec("sudo /sbin/iptables -D INPUT $num");
- */
+				  $num=shell_exec("sudo /sbin/iptables -L -n -v --line-numbers | grep '$ip->ip' |awk {'print $1'}");
+			  }
+			  shell_exec("sudo /sbin/iptables -D INPUT $num");
+	   */
 		$firewall::findOrfail($id)->delete();
 		$result = DB::table('iptables')->get(); // Replace 'iptables' with your MySQL table name
-	if (!file_exists('/var/www/html/sms-project/firewall/')) {
-		mkdir('/var/www/html/sms-project/firewall/', 0777, true);
-	}
+		if (!file_exists('/var/www/html/sms-project/firewall/')) {
+			mkdir('/var/www/html/sms-project/firewall/', 0777, true);
+		}
 		$myfile = fopen("/var/www/html/sms-project/firewall/rulesFW.v4", "w") or die("Unable to open file!");
 		$txt = "*filter\n
 :INPUT DROP [337085:33857280]\n
@@ -814,23 +832,23 @@ class Controller extends BaseController
 -A INPUT -p tcp -m tcp --dport 40144 -j ACCEPT
 -A INPUT -p tcp -m tcp --dport 998 -j ACCEPT
 -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT\n";
-fwrite($myfile, $txt);
-foreach ($result as $row) {
-	$ip = $row->ip;
-	$rule = $row->rule;
-	if ($rule == true) {
-		$rule = 'ACCEPT';
-	} else {
-		$rule = 'DROP';
-	}
-	$port = $row->port;
-	$proto = $row->proto;
-	$identify = $row->identify;
-	$txt = "###$identify\n";
-	fwrite($myfile, $txt);
-	$txt = "-A INPUT -s $ip -p $proto -m $proto --dport $port -j $rule\n";
-	fwrite($myfile, $txt);
-}
+		fwrite($myfile, $txt);
+		foreach ($result as $row) {
+			$ip = $row->ip;
+			$rule = $row->rule;
+			if ($rule == true) {
+				$rule = 'ACCEPT';
+			} else {
+				$rule = 'DROP';
+			}
+			$port = $row->port;
+			$proto = $row->proto;
+			$identify = $row->identify;
+			$txt = "###$identify\n";
+			fwrite($myfile, $txt);
+			$txt = "-A INPUT -s $ip -p $proto -m $proto --dport $port -j $rule\n";
+			fwrite($myfile, $txt);
+		}
 		$txt = "COMMIT\n";
 		fwrite($myfile, $txt);
 		shell_exec("sudo /usr/sbin/iptables-restore < /var/www/html/sms-project/firewall/rulesFW.v4");

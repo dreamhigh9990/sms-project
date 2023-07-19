@@ -70,7 +70,9 @@
           <?php endif; ?>
       </select>
       <br>
+      <div style="display: none">
       IDs Selected: <input id="selectCustomer" name="selectCustomer" type="text" value="<?php echo $customers->sales_customers;?>">
+      </div>
     </div>
   </div>
   <div class="form-group">
