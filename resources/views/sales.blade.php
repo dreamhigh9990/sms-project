@@ -14,10 +14,10 @@
 </style>
 @extends('layouts.master')
 @section('content')
-<h1>Customer</h1>
-@if (auth()->user()->profile == 1)
+<h1>Customers</h1>
+<!-- @if (auth()->user()->profile == 1)
 <a href="/customer/add" ype="button" class="btn btn-primary">Add Customer</a>
-@endif
+@endif -->
 <table class="table">
   <thead>
     <tr>
@@ -45,7 +45,7 @@
       <td><a href="/customer-bind?customer={{ $customer->uid }}" style="color: black;">{{ $customer->uid }}</a></td>
       -->
       <!-- <td>{{ $customer->name }}</td> -->
-      <td><a href="/sales-bind?customer={{ $customer->id }}" style="color: black;">{{ $customer->name }}</a></td>
+      <td>{{ $customer->name }}</td>
       <td>{{ $customer->company }}</td>
       @if ($customer->profile == 1)
       <td>Administrator</td>

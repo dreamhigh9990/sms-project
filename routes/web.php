@@ -25,6 +25,7 @@ Route::get('/customer/edit/{id}', [Controller::class, 'editCustomer']);
 Route::put('/customer/update/{id}', [Controller::class, 'updateCustomer']);
 
 Route::get('/customer-bind', [Controller::class, 'customerBind']);
+Route::get('/sales-bind', [Controller::class, 'salesBind']);
 
 Route::get('/provider', [Controller::class, 'provider']);
 Route::post('/provider', [Controller::class, 'storeProvider']);

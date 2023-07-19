@@ -45,17 +45,33 @@
       <option value="1" {{ ($customers->profile) == 1 ? "selected" : "" }}>Adminstrator</option>
       <option value="4" {{ ($customers->profile) == 4 ? "selected" : "" }}>Sales</option>
     </select>
-	 <div id="profileDiv" style="display : none;"> Select Customers:
-                <select class="form-select" id="companySales" name="companySales">
-                        <option value=""></option>
-                         @foreach($customersAll as $customer)
-                                @if ($customer->profile == 3)
-                                        <option value="<?php echo $customer->id?>"><?php echo $customer->id . " : " . $customer->name . "  -  " .$customer->uid?></option>
-                                @endif
-                        @endforeach
-                </select> <br>
-		IDs Selected: <input id="selectCustomer" name="selectCustomer" type="text" value="<?php echo $customers->sales_customers;?>">
-        </div>
+  </div>
+  <div>
+    <div id="profileDiv" style="display : none;"> 
+    <?php if($customers->profile == 4): ?>
+      Select Customers:
+    <?php elseif($customers->profile == 1): ?>
+      Select SalePerson:
+    <?php endif; ?>
+      <select class="form-select" id="companySales" name="companySales">
+        <option value=""></option>
+          <?php if($customers->profile == 4): ?>
+            @foreach($customersAll as $customer)
+              @if ($customer->profile == 1)
+                <option value="<?php echo $customer->id?>"><?php echo $customer->id . " : " . $customer->name . "  -  " .$customer->uid?></option>
+              @endif
+            @endforeach
+          <?php elseif($customers->profile == 1): ?>
+            @foreach($customersAll as $customer)
+              @if ($customer->profile == 4)
+                <option value="<?php echo $customer->id?>"><?php echo $customer->id . " : " . $customer->name . "  -  " .$customer->uid?></option>
+              @endif
+            @endforeach
+          <?php endif; ?>
+      </select>
+      <br>
+      IDs Selected: <input id="selectCustomer" name="selectCustomer" type="text" value="<?php echo $customers->sales_customers;?>">
+    </div>
   </div>
   <div class="form-group">
     <label for="pwd">TPS:</label>
@@ -78,12 +94,12 @@ echo  "               <script>
 ?>
 <script>
 var x = document.getElementById("profileDiv");
-if(document.getElementById('profile').value == "4") {
+if(document.getElementById('profile').value == "4" || document.getElementById('profile').value == "1") {
 	x.style.display = "block";
 }
 function checkProfile() {
         var x = document.getElementById("profileDiv");
-        if(document.getElementById('profile').value == "4") {
+        if(document.getElementById('profile').value == "4" || document.getElementById('profile').value == "1") {
                         x.style.display = "block";
         } else {
                  x.style.display = "none";

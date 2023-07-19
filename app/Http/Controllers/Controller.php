@@ -52,6 +52,31 @@ class Controller extends BaseController
 			return view('customer-bind', ['customers' => $customer->all(), 'customerName' => $customerName]);
 		}
 	}
+
+	public function salesBind(request $request)
+	{
+		$customerName = $request->query('customer');
+
+		$customer = new \App\Models\Customer();
+		$customerId = $request->query('customer');
+		$selected_customers = $customer::where('id', $customerId)->get();
+		$selected_customer = $selected_customers[0];
+
+		if ($selected_customer->profile == 4) {
+			$sales_customers = $selected_customer->sales_customers;
+			$sales_customers = explode(";", $sales_customers);
+			$customers = $customer::whereIn('id', $sales_customers)->get();
+			return view('sales', ['customers' => $customers, 'customerName' => $customerName]);
+		} else if ($selected_customer->profile == 1){
+			$sales_customers = $selected_customer->sales_customers;
+			$sales_customers = explode(";", $sales_customers);
+			$customers = $customer::whereIn('id', $sales_customers)->get();
+			return view('customer-sales', ['customers' => $customers, 'customerName' => $customerName]);
+		} else {
+			return view('sales', ['customers' => $customer->all(), 'customerName' => $customerName]);
+		}
+	}
+
 	public function ratesProvider()
 	{
 		$rates = new \App\Models\RateProvider();
