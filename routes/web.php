@@ -100,6 +100,7 @@ Route::delete('/firewall/delete/{id}', [Controller::class, 'deleteFirewall']);
 
 Route::get('/sendSMS', [Controller::class, 'sendSMS']);
 Route::post('/sendSMS', [Controller::class, 'sendSMSGW']);
+Route::get('/get-options', [Controller::class, 'getOptions'])->name('get.options');
 /*Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),

@@ -856,7 +856,9 @@ class Controller extends BaseController
 	}
 	public function sendSMS()
 	{
-		return view('sendSMS');
+		$connector = new \App\Models\Connectors();
+		$provider = new \App\Models\Provider();
+		return view('sendSMS', ['providers' => $provider->all(), 'connectors' => $connector->all()]);
 	}
 	public function sendSMSGW(Request $request)
 	{
@@ -888,4 +890,22 @@ class Controller extends BaseController
 	{
 		return view('summaryProvider');
 	}
+
+	public function getOptions(Request $request)
+    {
+
+		$connector = new \App\Models\Connectors();
+		// $provider = new \App\Models\Provider();
+		// return view('sendSMS', ['providers' => $provider->all(), 'connectors' => $connector->all()]);
+
+        $firstSelectValue = $request->input('firstSelectValue');
+
+        // Retrieve the options for the second select based on the first select value
+
+        $options = $connector::where('name', 'LIKE', '%'.$firstSelectValue.'%')->pluck('name', 'id');
+
+// var_dump($options);
+// 		die();
+        return response()->json($options);
+    }
 }
