@@ -1,37 +1,44 @@
 <style>
   tbody tr:hover {
-    background-color: white;
+    background-color: #D3D3D3;
     color: black;
+  }
+
+  tbody tr {
+    background-color: white;
+  }
+
+  thead tr {
+    background-color: white;
   }
 </style>
 @extends('layouts.master')
 @section('content')
 <h1>Providers Rates</h1>
 <a href="/rates-provider/add" ype="button" class="btn btn-primary">Add Rate</a>
+
+<form class="form-header" action="/rates-provider" method="GET">
+  <input class="au-input au-input--xl" type="text" name="search" placeholder="Search for name ..." value="{{ request('search') }}" />
+  <button class="au-btn--submit" type="submit">
+    <i class="zmdi zmdi-search"></i>
+  </button>
+</form>
+
 <table class="table">
   <thead>
     <tr>
-      <th>CODE</th>
-      <th>DESTINATION</th>
-      <th>PROVIDER/CONNECTOR</th>
-      <th>COST</th>
+      <th>Name</th>
+      <th>Currency</th>
       <th>Actions</th>
     </tr>
   </thead>
   <tbody>
 @foreach($rates as $rate)
 <tr>
-      <td>{{ $rate->code }}</td>
-      <td>{{ $rate->destination }}</td>
-      <td><?php $idProvider = DB::table('connectors')->where('name', "$rate->company")->value('provider'); $providerName = DB::table('providers')->where('id',$idProvider)->value('name'); echo$providerName;?> / {{ $rate->company }}</td>
-      <td>{{ $rate->cost }}</td>
+      <td>{{ $rate->Name }}</td>
+      <td>{{ $rate->Currency }}</td>
       <td>
-          <a href="/rates-provider/edit/{{ $rate->id }}" class="bi bi-pencil-square"></a>
-          <form action="/rates-provider/delete/{{ $rate->id }}" method="POST">
-          @csrf
-          @method('delete')
-          <button type="submit" style="color:red;" class="bi bi-trash3"></button>
-          </form>
+        <a href="rates-provider/view/{{$rate->id}}">Open Routes</a>
       </td>
 </tr>
 @endforeach

@@ -1,7 +1,15 @@
 <style>
   tbody tr:hover {
-    background-color: white;
+    background-color: #D3D3D3;
     color: black;
+  }
+
+  tbody tr {
+    background-color: white;
+  }
+
+  thead tr {
+    background-color: white;
   }
 </style>
 @extends('layouts.master')
@@ -10,34 +18,31 @@
 @if (auth()->user()->profile == 1)
 <a href="/rates-customer/add" ype="button" class="btn btn-primary">Add Rate</a>
 @endif
+
+<form class="form-header" action="/rates-customer" method="GET">
+  <input class="au-input au-input--xl" type="text" name="search" placeholder="Search for name ..." value="{{ request('search') }}" />
+  <button class="au-btn--submit" type="submit">
+    <i class="zmdi zmdi-search"></i>
+  </button>
+</form>
+
 <table class="table">
   <thead>
     <tr>
-      <th>CODE</th>
-      <th>DESTINATION</th>
-      <th>Customer</th>
-      <th>COST</th>
-      <th>Actions</th>
+      <th>Name</th>
+      <th>Currency</th>
+      <th>Action</th>
     </tr>
   </thead>
   <tbody>
 <tr>
 @foreach($rates as $rate)
 <tr>
-      <td>{{ $rate->code }}</td>
-      <td>{{ $rate->destination }}</td>
-      <td> <?php $customer = DB::table('customers')->where('id', "$rate->company")->value('name'); echo $customer;?></td>
-      <td>{{ $rate->cost }}</td>
-     @if (auth()->user()->profile == 1)
-	 <td>
-          <a href="/rates-customer/edit/{{ $rate->id}}" class="bi bi-pencil-square"></a>
-          <form action="/rates-customer/delete/{{ $rate->id }}" method="POST">
-          @csrf
-          @method('delete')
-          <button type="submit" style="color:red;" class="bi bi-trash3"></button>
-          </form>
+      <td>{{ $rate->Name }}</td>
+      <td>{{ $rate->Currency }}</td>
+	    <td>
+        <a href="rates-customer/view/{{$rate->id}}">Open Rates</a>
       </td>
-	@endif
     </tr>
 @endforeach
   </tbody>

@@ -5,7 +5,7 @@
         <div class="container-fluid">
             <div class="header-mobile-inner">
                 <a class="logo" href="index.html">
-                    <img src="images/icon/logo.png" alt="CoolAdmin" />
+                    <img src="/images/icon/logo.png" alt="CoolAdmin" />
                 </a>
                 <button class="hamburger hamburger--slider" type="button">
                     <span class="hamburger-box">
@@ -157,7 +157,7 @@
                             <div class="account-wrap">
                                 <div class="account-item clearfix js-item-menu">
                                     <div class="image">
-                                        <img src="images/icon/207-2070782_new-svg-image-login-icon.png" alt="" />
+                                        <img src="/images/icon/207-2070782_new-svg-image-login-icon.png" alt="" />
                                     </div>
                                     <div class="content">
                                         <a class="js-acc-btn" href="#">{{ auth()->user()->name ?? 'User'}}</a>

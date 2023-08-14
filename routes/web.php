@@ -62,6 +62,7 @@ Route::delete('/rates-provider/delete/{id}', [Controller::class, 'deleteRateProv
 Route::get('/rates-provider/add', [Controller::class, 'addRatesProvider']);
 Route::get('/rates-provider/edit/{id}', [Controller::class, 'editRatesProvider']);
 Route::put('/rates-provider/update/{id}', [Controller::class, 'updateRatesProvider']);
+Route::get('/rates-provider/view/{id}', [Controller::class, 'viewRatesProvider']);
 
 Route::get('/rates-customer', [Controller::class, 'ratesCustomer']);
 Route::post('/rates-customer', [Controller::class, 'storeRatesCustomer']);
@@ -70,6 +71,7 @@ Route::get('/rates-customer/add', [Controller::class, 'addRatesCustomer']);
 Route::get('/rates-customer/edit/{id}', [Controller::class, 'editRatesCustomer']);
 Route::post('/rates-customer/edit/{id}', [Controller::class, 'editRatesCustomer']);
 Route::put('/rates-customer/update/{id}', [Controller::class, 'updateRatesCustomer']);
+Route::get('/rates-customer/view/{id}', [Controller::class, 'viewRatesCustomer']);
 
 Route::get('/filters', [Controller::class, 'filter']);
 Route::post('/filters', [Controller::class, 'storeFilter']);

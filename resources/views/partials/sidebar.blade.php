@@ -8,7 +8,7 @@
 <aside class="menu-sidebar d-none d-lg-block">
     <div class="logo">
         <a href="#">
-            <img style="width: 75px;" src="images/cropped-logo1.png" alt="{{ config('app.name', '') }}" />
+            <img style="width: 75px;" src="/images/cropped-logo1.png" alt="{{ config('app.name', '') }}" />
         </a>
     </div>
     <div class="menu-sidebar__content js-scrollbar1">
@@ -91,7 +91,7 @@
 			@endif
 			 @if (auth()->user()->profile == 1)
                         <li>
-                            <a href="/rates-provider">Providers Rates</a>
+                            <a href="/rates-provider">Vendor Rates</a>
 			</li>
 			@endif
                     </ul>

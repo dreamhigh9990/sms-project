@@ -7,22 +7,47 @@ tbody tr:hover {
 @extends('layouts.master')
 @section('content')
 <h1>Mt Routes</h1>
-<a href="/mt-router/add" ype="button" class="btn btn-primary">Add Router</a>
+
+<div class="row">
+  <div class="col-md-6">
+    <div style="background-color: lightgrey; font-weight: bold;">
+      Filter
+    </div>
+
+    <form class="form-header" action="/mt-router" method="GET">
+      @csrf
+      <input class="p-2 m-2" type="text" name="search" value="{{ request('search') }}" />
+      <button class="au-btn--submit p-2 m-2" type="submit">
+          <i class="zmdi zmdi-search"></i>
+      </button>
+    </form>
+  </div>
+  <div class="col-md-6">
+    <div style="background-color: lightgrey; font-weight: bold;">
+      Add Routing Group
+    </div>
+    <a href="/mt-router/add" ype="button" class="btn btn-primary">Add Router</a>
+  </div>
+</div>
+
 <table class="table">
   <thead>
     <tr>
-      <th>Order</th>
-      <th>Type</th>
-      <th>Connector</th>
-      <th>Filter</th>
+      <th>Name</th>
+      <th>Policy</th>
+      <th>Description</th>
       <th>Actions</th>
     </tr>
   </thead>
   <tbody>
-    @php    
-    $route = shell_exec("python3 /opt/jasmin/cli/mt-routers.py | sed 's/<U //g' | sed 's/<DA //g' | sed 's/<SA //g' | sed 's/<C //g' | sed 's/<SM //g'| sed 's/<TG //g'| sed 's/>//g' | sed 's/, /,/g' | awk {'if($1!=\"#Order\" && $1!=\"Total\" && $1!=\"\" && $1!=\"mtrouter\") {print \"<tr><td>\"$1\"</td><td>\"$2\"</td><td>\"$5\"</td><td>\"$6\"</td><td><a href='\\''\/mt-router\/delete\/ \"$1\" '\\'' class='\\''bi bi bi-trash3'\\''></a></td></tr>\"}'} | sed 's/#//g'");
-    echo $route;    
-    @endphp
+  @foreach($routes as $route)
+<tr>
+      <td>{{ $route->Name }}</td>
+      <td>{{ $route->Policy }}</td>
+      <td>{{ $route->Description }}</td>
+      <td></td>
+    </tr>
+@endforeach
   </tbody>
 </table>
 @endsection

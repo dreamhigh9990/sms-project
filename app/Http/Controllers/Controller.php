@@ -98,7 +98,13 @@ class Controller extends BaseController
 	public function ratesProvider()
 	{
 		$rates = new \App\Models\RateProvider();
-		return view('rates-provider', ['rates' => $rates->all()]);
+		
+		if(!request("search"))
+			$providers = $rates->all();
+		else
+			$providers = $rates->where('Name', 'like', "%".request("search")."%")->get();
+
+		return view('rates-provider', ['rates' => $providers]);
 	}
 	public function ratesCustomer()
 	{
@@ -106,10 +112,21 @@ class Controller extends BaseController
 		if (auth()->user()->profile == 4) {
 			$sales_customers = auth()->user()->sales_customers;
 			$sales_customers = explode(";", $sales_customers);
-			$customers = $rates::whereIn('company', $sales_customers)->get();
+
+			if(!request("search"))
+				$customers = $rates::whereIn('company', $sales_customers)->get();
+			else
+				$customers = $rates::whereIn('company', $sales_customers)->where('Name', 'like', "%".request("search")."%")->get();
+
 			return view('rates-customer', ['rates' => $customers]);
 		} else {
-			return view('rates-customer', ['rates' => $rates->all()]);
+			
+			if(!request("search"))
+				$customers = $rates->all();
+			else
+				$customers = $rates->where('Name', 'like', "%".request("search")."%")->get();
+
+			return view('rates-customer', ['rates' => $customers]);
 		}
 	}
 	public function editRatesCustomer($id)
@@ -118,6 +135,20 @@ class Controller extends BaseController
 		$rates = new \App\Models\RateCustomer();
 		return view('editCustomerRate', ['rate' => $rates::findOrfail($id), 'customers' => $customer->all()]);
 	}
+
+	public function viewRatesCustomer($pf) {
+		$rateCustomerDetail = new \App\Models\RateCustomerDetail();
+		$datas = $rateCustomerDetail::where('prefix', $pf)->get();
+		
+		return view('viewCustomerRate', ['datas' => $datas, 'page_title' => 'Customer Rates']);
+	}
+	public function viewRatesProvider($pf) {
+		$rateCustomerDetail = new \App\Models\RateCustomerDetail();
+		$datas = $rateCustomerDetail::where('prefix', $pf)->get();
+		
+		return view('viewCustomerRate', ['datas' => $datas, 'page_title' => 'Vendor Rates']);
+	}
+
 	public function updateRatesCustomer(Request $request)
 	{
 		$rates = new \App\Models\RateCustomer();
@@ -524,11 +555,18 @@ class Controller extends BaseController
 	}
 	public function Mtrouter()
 	{
-		$routers = shell_exec("python3 /opt/jasmin/cli/mt-router.py | awk '{print $1}' | sed 's/#//g'");
-		$routers = explode("\n", $routers);
+		// $routers = shell_exec("python3 /opt/jasmin/cli/mt-router.py | awk '{print $1}' | sed 's/#//g'");
+		// $routers = explode("\n", $routers);
+		$MtRoute = new \App\Models\MtRoute();
+
+		if(!request("search"))
+			$routes = $MtRoute->all();
+		else
+			$routes = $MtRoute->where('Name', 'like', "%".request("search")."%")->get();
+
 		return view(
 			'mt-router',
-			['routers' => $routers]
+			['routes' => $routes]
 		);
 	}
 	public function addMtrouter()
@@ -684,13 +722,13 @@ class Controller extends BaseController
 	public function logs()
 	{
 		$arrFiles = array();
-		$handle = opendir('/var/log/jasmin');
-		if ($handle) {
-			while (($entry = readdir($handle)) !== FALSE) {
-				$arrFiles[] = $entry;
-			}
-		}
-		closedir($handle);
+		// $handle = opendir('/var/log/jasmin');
+		// if ($handle) {
+		// 	while (($entry = readdir($handle)) !== FALSE) {
+		// 		$arrFiles[] = $entry;
+		// 	}
+		// }
+		// closedir($handle);
 		return view('logs', ['files' => $arrFiles]);
 	}
 	public function refill()
