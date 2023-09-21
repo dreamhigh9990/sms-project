@@ -928,6 +928,10 @@ class Controller extends BaseController
 	{
 		return view('summaryProvider');
 	}
+	public function summary()
+	{
+		return view('summary');
+	}
 
 	public function getOptions(Request $request)
     {

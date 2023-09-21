@@ -32,6 +32,9 @@ $logs = new  \App\Models\Submit_log();
 $rateCustomers = new \App\Models\RateCustomer();
 foreach ($rateCustomers->orderBy('company','ASC')->get() as $rate) {
 	$customer = $customers::where('id',$rate->company)->first();
+  if(!$customer) {
+    continue;
+  }
 	$deliv = $logs::where('uid', $customer->uid)->where('status','DELIVRD')->where('ratedestcustomer',$rate->destination)->count();
          $sent = $logs::where('uid', $customer->uid)->where('ratedestcustomer',$rate->destination)->count();
          $fail =  $logs::where('uid', $customer->uid)->where('ratedestcustomer',$rate->destination)->where('status', 'UNDELIV')->count();

@@ -1,4 +1,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+<style>
+  tbody tr:hover {
+    background-color: #D3D3D3;
+    color: black;
+  }
+
+  tbody tr {
+    background-color: white;
+  }
+
+  thead tr {
+    background-color: white;
+  }
+</style>
 
 @extends('layouts.master')
 @section('content')
@@ -16,28 +30,66 @@
 <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search for names.." title="Type in a name">&ensp;
 <input type="text" id="myInput2" onkeyup="myFunction2()" placeholder="Search for Countries.." title="Type in a Contry">&ensp;
 <input type="text" id="myInput3" onkeyup="myFunction3()" placeholder="Search for Prefix.." title="Type in a Prefix">
+
 <table class="table" id="myTable">
   <thead>
-    <tr class="header">
-      <th onclick="sortBy(0)">Customer Name</th>
+    <tr>
+      <th>Customer Name</th>
       <th>Country</th>
-      <th>Prefix</th>
-      <th>Sent</th>
+      <!-- <th>Prefix</th> -->
+      <th>Attempts</th>
       <th>Delivered</th>
-      <th>Failure or Undeliv</th>
+      <th>Failure</th>
+      <th>Margin</th>
+      <th>Total Revenue of Client</th>
+      <th>Total Revenue of Vendor</th>
+      <!-- <th>Average rate per min client</th> -->
     </tr>
   </thead>
-
   <tbody>
-		<?php
-		$now = date('Y-m-d');
-		$customers = new  \App\Models\Customer();
-		$logs = new  \App\Models\Submit_log();
-		$rateCustomers = new \App\Models\RateCustomer();
-		?>
-</tbody>
+@if (auth()->user()->profile == 1)
+<?php
+$customers = new  \App\Models\Customer();
+$logs = new  \App\Models\Submit_log();
+$rateCustomers = new \App\Models\RateCustomer();
+foreach ($rateCustomers->orderBy('company','ASC')->get() as $rate) {
+	$customer = $customers::where('id',$rate->company)->first();
+  if(!$customer) {
+    continue;
+  }
+		$deliv = $logs::where('uid', $customer->uid)->where('status','DELIVRD')->where('ratedestcustomer',$rate->destination)->count();
+		$rows = $logs::where('uid', $customer->uid)->where('ratedestcustomer',$rate->destination);
+		$sent = $rows->count();
+		$fail =  $logs::where('uid', $customer->uid)->where('ratedestcustomer',$rate->destination)->where('status', 'UNDELIV')->count();
+		$fail += $logs::where('uid', $customer->uid)->where('ratedestcustomer',$rate->destination)->where('status', 'like', '%FAIL%')->count();
+	 
+		if ($sent != 0) {
+			$rate_customer_sum = 0;
+			$rate_vendor_sum = 0;
 
+			foreach($rows->get() as $row) {
+				$rate_customer_sum += $row->ratecustomer;
+				$rate_vendor_sum += $row->rateprovider;
+			}
+		
+			echo "<tr>";
+			echo "<td>$customer->name</td>";
+			echo "<td>$rate->destination</td>";
+			// echo "<td>$rate->code</td>";
+			echo "<td>$sent</td>";
+			echo "<td>$deliv</td>";
+			echo "<td>$fail</td>";
+			echo "<td>".$rate_customer_sum - $rate_vendor_sum."</td>";
+			echo "<td>$rate_customer_sum</td>";
+			echo "<td>$rate_vendor_sum</td>";
+			echo "<tr>";
+		}
+	}
+?>
+</tbody>
 </table>
+@endif
+
 <script>
 function myFunction() {
 	var input, filter, table, tr, td, i, txtValue;
